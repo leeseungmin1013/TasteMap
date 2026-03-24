@@ -26,7 +26,7 @@ export default function Room() {
   const [nickname, setNickname] = useState("");
   const [answers, setAnswers] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
-  const graphRef = useRef<ForceGraphMethods>();
+  const graphRef = useRef<ForceGraphMethods | undefined>(undefined);
   const [exportBg, setExportBg] = useState("#f0f3f6");
   const [exportPadding, setExportPadding] = useState(24);
   const [exportScale, setExportScale] = useState(3);

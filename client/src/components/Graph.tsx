@@ -26,6 +26,10 @@ type GraphNode = {
   accent?: string;
   x?: number;
   y?: number;
+  vx?: number;
+  vy?: number;
+  fx?: number;
+  fy?: number;
 };
 
 type GraphLink = {
@@ -42,7 +46,7 @@ export default function Graph({
 }: GraphProps) {
   const internalContainerRef = useRef<HTMLDivElement | null>(null);
   const activeContainerRef = containerRef ?? internalContainerRef;
-  const internalRef = useRef<ForceGraphMethods>();
+  const internalRef = useRef<ForceGraphMethods | undefined>(undefined);
   const activeRef = graphRef ?? internalRef;
   const [size, setSize] = useState({ width: 600, height: 400 });
 
@@ -173,9 +177,9 @@ export default function Graph({
 
     graph.d3Force(
       "collide",
-      forceCollide<GraphNode>((node) => (node as GraphNode & { __radius?: number }).__radius ?? 80)
+      (forceCollide((node: GraphNode) => (node as GraphNode & { __radius?: number }).__radius ?? 80)
         .strength(1)
-        .iterations(2)
+        .iterations(2) as unknown as Parameters<typeof graph.d3Force>[1])
     );
   }, [graphData, teamName, questions, participants, activeRef]);
 
