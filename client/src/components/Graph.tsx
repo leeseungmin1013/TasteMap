@@ -12,7 +12,7 @@ type GraphProps = {
   teamName: string;
   questions: string[];
   participants: Participant[];
-  graphRef?: React.RefObject<ForceGraphMethods | null>;
+  graphRef?: React.MutableRefObject<ForceGraphMethods | undefined>;
   containerRef?: React.RefObject<HTMLDivElement | null>;
 };
 
@@ -24,6 +24,13 @@ type GraphNode = {
   boxWidth?: number;
   boxHeight?: number;
   accent?: string;
+  x?: number;
+  y?: number;
+};
+
+type GraphLink = {
+  source: string | GraphNode;
+  target: string | GraphNode;
 };
 
 export default function Graph({
@@ -35,7 +42,7 @@ export default function Graph({
 }: GraphProps) {
   const internalContainerRef = useRef<HTMLDivElement | null>(null);
   const activeContainerRef = containerRef ?? internalContainerRef;
-  const internalRef = useRef<ForceGraphMethods | null>(null);
+  const internalRef = useRef<ForceGraphMethods>();
   const activeRef = graphRef ?? internalRef;
   const [size, setSize] = useState({ width: 600, height: 400 });
 
@@ -145,7 +152,7 @@ export default function Graph({
     const boxWidth = maxWidth + paddingX * 2;
     const boxHeight = lines.length * lineHeight + paddingY * 2;
 
-    return { lines, lineHeight, boxWidth, boxHeight, paddingX, paddingY };
+    return { lines, lineHeight, boxWidth, boxHeight, paddingY };
   };
 
   useEffect(() => {
@@ -166,7 +173,7 @@ export default function Graph({
 
     graph.d3Force(
       "collide",
-      forceCollide((node) => (node as GraphNode & { __radius?: number }).__radius ?? 80)
+      forceCollide<GraphNode>((node) => (node as GraphNode & { __radius?: number }).__radius ?? 80)
         .strength(1)
         .iterations(2)
     );
@@ -202,8 +209,8 @@ export default function Graph({
         nodeColor={(node) =>
           (node as GraphNode).type === "team" ? "#101418" : ((node as GraphNode).accent ?? "#2f7df6")
         }
-        nodeVal={(node) => ((node as { type: string }).type === "team" ? 18 : 12)}
-        linkDistance={(link) => {
+        nodeVal={(node: GraphNode) => (node.type === "team" ? 18 : 12)}
+        linkDistance={(link: GraphLink) => {
           const target = link.target as GraphNode;
           return target?.type === "user" ? 240 : 200;
         }}
@@ -212,18 +219,18 @@ export default function Graph({
         cooldownTicks={60}
         d3VelocityDecay={0.2}
         enableNodeDrag
-        onNodeDrag={(node) => {
+        onNodeDrag={(node: GraphNode) => {
           node.fx = node.x;
           node.fy = node.y;
         }}
-        onNodeDragEnd={(node) => {
+        onNodeDragEnd={(node: GraphNode) => {
           node.fx = node.x;
           node.fy = node.y;
         }}
         nodeCanvasObject={(node, ctx, globalScale) => {
           const typed = node as GraphNode;
           const fontSize = (typed.type === "team" ? 14 : 11) / globalScale;
-          const { lines, lineHeight, boxWidth, boxHeight, paddingX, paddingY } =
+          const { lines, lineHeight, boxWidth, boxHeight, paddingY } =
             measureNode(ctx, typed, fontSize);
 
           typed.boxWidth = boxWidth;
