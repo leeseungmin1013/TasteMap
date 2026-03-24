@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import ForceGraph2D, { type ForceGraphMethods } from "react-force-graph-2d";
+import ForceGraph2D from "react-force-graph-2d";
 import { forceCollide } from "d3-force";
 
 export type Participant = {
@@ -12,7 +12,7 @@ type GraphProps = {
   teamName: string;
   questions: string[];
   participants: Participant[];
-  graphRef?: React.MutableRefObject<ForceGraphMethods | undefined>;
+  graphRef?: React.MutableRefObject<any>;
   containerRef?: React.RefObject<HTMLDivElement | null>;
 };
 
@@ -32,11 +32,6 @@ type GraphNode = {
   fy?: number;
 };
 
-type GraphLink = {
-  source: string | GraphNode;
-  target: string | GraphNode;
-};
-
 export default function Graph({
   teamName,
   questions,
@@ -46,7 +41,7 @@ export default function Graph({
 }: GraphProps) {
   const internalContainerRef = useRef<HTMLDivElement | null>(null);
   const activeContainerRef = containerRef ?? internalContainerRef;
-  const internalRef = useRef<ForceGraphMethods | undefined>(undefined);
+  const internalRef = useRef<any>(null);
   const activeRef = graphRef ?? internalRef;
   const [size, setSize] = useState({ width: 600, height: 400 });
 
@@ -179,7 +174,7 @@ export default function Graph({
       "collide",
       (forceCollide((node: GraphNode) => (node as GraphNode & { __radius?: number }).__radius ?? 80)
         .strength(1)
-        .iterations(2) as unknown as Parameters<typeof graph.d3Force>[1])
+        .iterations(2) as any)
     );
   }, [graphData, teamName, questions, participants, activeRef]);
 
@@ -213,8 +208,8 @@ export default function Graph({
         nodeColor={(node) =>
           (node as GraphNode).type === "team" ? "#101418" : ((node as GraphNode).accent ?? "#2f7df6")
         }
-        nodeVal={(node: GraphNode) => (node.type === "team" ? 18 : 12)}
-        linkDistance={(link: GraphLink) => {
+        nodeVal={(node: any) => ((node as GraphNode).type === "team" ? 18 : 12)}
+        linkDistance={(link: any) => {
           const target = link.target as GraphNode;
           return target?.type === "user" ? 240 : 200;
         }}
@@ -223,11 +218,11 @@ export default function Graph({
         cooldownTicks={60}
         d3VelocityDecay={0.2}
         enableNodeDrag
-        onNodeDrag={(node: GraphNode) => {
+        onNodeDrag={(node: any) => {
           node.fx = node.x;
           node.fy = node.y;
         }}
-        onNodeDragEnd={(node: GraphNode) => {
+        onNodeDragEnd={(node: any) => {
           node.fx = node.x;
           node.fy = node.y;
         }}

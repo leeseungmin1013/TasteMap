@@ -4,7 +4,6 @@ import Graph from "../components/Graph";
 import type { Participant as GraphParticipant } from "../components/Graph";
 import QuestionForm from "../components/QuestionForm";
 import { supabase } from "../lib/supabase";
-import type { ForceGraphMethods } from "react-force-graph-2d";
 
 type RoomRecord = {
   id: string;
@@ -26,7 +25,7 @@ export default function Room() {
   const [nickname, setNickname] = useState("");
   const [answers, setAnswers] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
-  const graphRef = useRef<ForceGraphMethods | undefined>(undefined);
+  const graphRef = useRef<any>(null);
   const [exportBg, setExportBg] = useState("#f0f3f6");
   const [exportPadding, setExportPadding] = useState(24);
   const [exportScale, setExportScale] = useState(3);
