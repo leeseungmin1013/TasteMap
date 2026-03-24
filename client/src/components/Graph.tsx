@@ -176,6 +176,11 @@ export default function Graph({
         .strength(1)
         .iterations(2) as any)
     );
+
+    const linkForce = graph.d3Force("link") as any;
+    if (linkForce?.distance) {
+      linkForce.distance(240);
+    }
   }, [graphData, teamName, questions, participants, activeRef]);
 
   const drawRoundedRect = (
@@ -209,10 +214,6 @@ export default function Graph({
           (node as GraphNode).type === "team" ? "#101418" : ((node as GraphNode).accent ?? "#2f7df6")
         }
         nodeVal={(node: any) => ((node as GraphNode).type === "team" ? 18 : 12)}
-        linkDistance={(link: any) => {
-          const target = link.target as GraphNode;
-          return target?.type === "user" ? 240 : 200;
-        }}
         linkColor={() => "#c7cdd4"}
         linkWidth={1.5}
         cooldownTicks={60}

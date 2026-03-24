@@ -43,10 +43,10 @@ export default function Room() {
 
   const handleDownload = () => {
     const graph = graphRef.current as
-      | (ForceGraphMethods & {
+      | {
           canvas?: () => HTMLCanvasElement;
           renderer?: () => { domElement: HTMLCanvasElement };
-        })
+        }
       | null;
     if (!graph) return;
 
